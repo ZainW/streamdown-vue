@@ -1,4 +1,4 @@
-import { inject, provide, computed, type InjectionKey, type ComputedRef } from 'vue'
+import { inject, provide, type InjectionKey, type ComputedRef } from 'vue'
 import type { StreamdownContext } from '../types'
 
 const defaultContext: StreamdownContext = {
@@ -9,7 +9,8 @@ const defaultContext: StreamdownContext = {
   prefix: '',
 }
 
-export const StreamdownContextKey: InjectionKey<ComputedRef<StreamdownContext>> = Symbol('StreamdownContext')
+export const StreamdownContextKey: InjectionKey<ComputedRef<StreamdownContext>> =
+  Symbol('StreamdownContext')
 
 export function provideStreamdownContext(ctx: ComputedRef<StreamdownContext>) {
   provide(StreamdownContextKey, ctx)

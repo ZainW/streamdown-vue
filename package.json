@@ -2,6 +2,24 @@
   "name": "streamdown-vue3",
   "version": "0.1.0",
   "description": "Vue 3 component for rendering AI-streamed markdown with incomplete syntax handling, block memoization, and animation",
+  "keywords": [
+    "ai",
+    "llm",
+    "markdown",
+    "shiki",
+    "streaming",
+    "vue"
+  ],
+  "homepage": "https://github.com/ZainW/streamdown-vue",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ZainW/streamdown-vue"
+  },
+  "files": [
+    "dist",
+    "styles.css"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -13,34 +31,17 @@
     },
     "./styles.css": "./styles.css"
   },
-  "files": [
-    "dist",
-    "styles.css"
-  ],
   "scripts": {
     "build": "vite build && vue-tsc --emitDeclarationOnly",
     "dev": "vite build --watch",
+    "fmt": "oxfmt .",
+    "fmt:check": "oxfmt --check .",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "vue-tsc --noEmit"
   },
-  "peerDependencies": {
-    "vue": "^3.3.0"
-  },
-  "keywords": [
-    "vue",
-    "markdown",
-    "streaming",
-    "ai",
-    "llm",
-    "shiki"
-  ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ZainW/streamdown-vue"
-  },
-  "homepage": "https://github.com/ZainW/streamdown-vue",
   "dependencies": {
     "clsx": "^2.1.1",
     "html-url-attributes": "^3.0.1",
@@ -55,18 +56,25 @@
     "unified": "^11.0.5",
     "unist-util-visit": "^5.1.0"
   },
-  "optionalDependencies": {
-    "shiki": "^4.0.0"
-  },
   "devDependencies": {
     "@types/hast": "^3.0.4",
     "@vue/test-utils": "^2.4.6",
     "happy-dom": "^20.8.7",
+    "oxfmt": "^0.42.0",
+    "oxlint": "^1.57.0",
+    "oxlint-tsgolint": "^0.17.3",
     "typescript": "^6.0.2",
     "vite": "^8.0.2",
     "vite-plugin-dts": "^4.5.4",
+    "vite-plugin-oxlint": "^2.0.1",
     "vitest": "^4.1.1",
     "vue": "^3.5.30",
     "vue-tsc": "^3.2.6"
+  },
+  "peerDependencies": {
+    "vue": "^3.3.0"
+  },
+  "optionalDependencies": {
+    "shiki": "^4.0.0"
   }
 }

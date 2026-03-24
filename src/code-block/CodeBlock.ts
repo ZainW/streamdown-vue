@@ -1,4 +1,4 @@
-import { defineComponent, h, computed, type PropType } from 'vue'
+import { defineComponent, h, computed } from 'vue'
 import { CodeBlockContainer } from './CodeBlockContainer'
 import { CodeBlockHeader } from './CodeBlockHeader'
 import { CodeBlockBody } from './CodeBlockBody'

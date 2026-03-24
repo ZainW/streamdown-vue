@@ -15,10 +15,7 @@ describe('createAnimatePlugin', () => {
 
   it('tracks character count after processing', () => {
     const plugin = createAnimatePlugin()
-    const processor = unified()
-      .use(remarkParse)
-      .use(remarkRehype)
-      .use(plugin.rehypeAnimate)
+    const processor = unified().use(remarkParse).use(remarkRehype).use(plugin.rehypeAnimate)
 
     const mdast = processor.parse('Hello world')
     processor.runSync(mdast) as Root
@@ -30,10 +27,7 @@ describe('createAnimatePlugin', () => {
     const plugin = createAnimatePlugin()
     plugin.setPrevContentLength(0) // Everything is "new"
 
-    const processor = unified()
-      .use(remarkParse)
-      .use(remarkRehype)
-      .use(plugin.rehypeAnimate)
+    const processor = unified().use(remarkParse).use(remarkRehype).use(plugin.rehypeAnimate)
 
     const mdast = processor.parse('Hello world')
     const hast = processor.runSync(mdast) as Root
@@ -48,18 +42,12 @@ describe('createAnimatePlugin', () => {
 
     // First render
     plugin.setPrevContentLength(0)
-    const processor1 = unified()
-      .use(remarkParse)
-      .use(remarkRehype)
-      .use(plugin.rehypeAnimate)
+    const processor1 = unified().use(remarkParse).use(remarkRehype).use(plugin.rehypeAnimate)
     processor1.runSync(processor1.parse('Hello'))
 
     // Second render — set prev to first render's count
     plugin.setPrevContentLength(plugin.getLastRenderCharCount())
-    const processor2 = unified()
-      .use(remarkParse)
-      .use(remarkRehype)
-      .use(plugin.rehypeAnimate)
+    const processor2 = unified().use(remarkParse).use(remarkRehype).use(plugin.rehypeAnimate)
     const hast2 = processor2.runSync(processor2.parse('Hello')) as Root
 
     // "Hello" should NOT be wrapped in animated spans since it was already rendered
@@ -75,10 +63,7 @@ describe('createAnimatePlugin', () => {
     })
     plugin.setPrevContentLength(0)
 
-    const processor = unified()
-      .use(remarkParse)
-      .use(remarkRehype)
-      .use(plugin.rehypeAnimate)
+    const processor = unified().use(remarkParse).use(remarkRehype).use(plugin.rehypeAnimate)
 
     const hast = processor.runSync(processor.parse('Test')) as Root
     const hastStr = JSON.stringify(hast)

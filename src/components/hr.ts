@@ -4,9 +4,10 @@ export const Hr = defineComponent({
   name: 'Hr',
   inheritAttrs: false,
   setup(_, { attrs }) {
-    return () => h('hr', {
-      ...attrs,
-      'data-streamdown': 'hr',
-    })
+    return () =>
+      h('hr', {
+        ...attrs,
+        'data-streamdown': 'hr',
+      })
   },
 })

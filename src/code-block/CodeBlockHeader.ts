@@ -18,10 +18,14 @@ export const CodeBlockHeader = defineComponent({
 
       // Language label
       children.push(
-        h('span', {
-          'data-streamdown': 'code-language',
-          class: 'text-xs text-muted-foreground select-none',
-        }, props.language || 'text')
+        h(
+          'span',
+          {
+            'data-streamdown': 'code-language',
+            class: 'text-xs text-muted-foreground select-none',
+          },
+          props.language || 'text',
+        ),
       )
 
       // Control buttons
@@ -35,16 +39,24 @@ export const CodeBlockHeader = defineComponent({
 
       if (buttons.length > 0) {
         children.push(
-          h('div', {
-            class: 'flex items-center gap-1',
-          }, buttons)
+          h(
+            'div',
+            {
+              class: 'flex items-center gap-1',
+            },
+            buttons,
+          ),
         )
       }
 
-      return h('div', {
-        'data-streamdown': 'code-header',
-        class: 'flex items-center justify-between px-4 py-2 border-b border-border',
-      }, children)
+      return h(
+        'div',
+        {
+          'data-streamdown': 'code-header',
+          class: 'flex items-center justify-between px-4 py-2 border-b border-border',
+        },
+        children,
+      )
     }
   },
 })

@@ -13,32 +13,55 @@ export const CodeBlockCopyButton = defineComponent({
 
     async function handleCopy() {
       if (ctx.isAnimating) return
+
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        try {
+          await navigator.clipboard.writeText(props.code)
+          copied.value = true
+          setTimeout(() => {
+            copied.value = false
+          }, 2000)
+          return
+        } catch {
+          // Fall through to the DOM-based fallback below.
+        }
+      }
+
+      if (typeof document === 'undefined') {
+        return
+      }
+
       try {
-        await navigator.clipboard.writeText(props.code)
-        copied.value = true
-        setTimeout(() => { copied.value = false }, 2000)
-      } catch {
-        // Fallback for older browsers
         const textarea = document.createElement('textarea')
         textarea.value = props.code
         document.body.appendChild(textarea)
         textarea.select()
-        document.execCommand('copy')
+        if (typeof document.execCommand === 'function') {
+          document.execCommand('copy')
+        }
         document.body.removeChild(textarea)
         copied.value = true
-        setTimeout(() => { copied.value = false }, 2000)
+        setTimeout(() => {
+          copied.value = false
+        }, 2000)
+      } catch {
+        // Gracefully no-op when neither clipboard API nor DOM fallback works.
       }
     }
 
-    return () => h('button', {
-      type: 'button',
-      'data-streamdown': 'code-copy-button',
-      title: copied.value ? 'Copied!' : 'Copy code',
-      disabled: ctx.isAnimating,
-      onClick: handleCopy,
-      class: 'inline-flex items-center justify-center rounded p-1 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50',
-    }, [
-      h(copied.value ? CheckIcon : CopyIcon),
-    ])
+    return () =>
+      h(
+        'button',
+        {
+          type: 'button',
+          'data-streamdown': 'code-copy-button',
+          title: copied.value ? 'Copied!' : 'Copy code',
+          disabled: ctx.isAnimating,
+          onClick: handleCopy,
+          class:
+            'inline-flex items-center justify-center rounded p-1 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50',
+        },
+        [h(copied.value ? CheckIcon : CopyIcon)],
+      )
   },
 })

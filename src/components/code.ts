@@ -9,10 +9,14 @@ export const Code = defineComponent({
   inheritAttrs: false,
   setup(_, { attrs, slots }: SetupContext) {
     return () => {
-      return h('code', {
-        ...attrs,
-        'data-streamdown': 'inline-code',
-      }, slots.default?.())
+      return h(
+        'code',
+        {
+          ...attrs,
+          'data-streamdown': 'inline-code',
+        },
+        slots.default?.(),
+      )
     }
   },
 })
@@ -38,14 +42,15 @@ export const Pre = defineComponent({
         // or our Code component (which has name 'Code')
         const isCodeElement =
           child?.type === 'code' ||
-          (child?.type && typeof child.type === 'object' && 'name' in child.type && child.type.name === 'Code')
+          (child?.type &&
+            typeof child.type === 'object' &&
+            'name' in child.type &&
+            child.type.name === 'Code')
 
         if (isCodeElement && child?.props) {
           // Extract language from class like "language-javascript"
           const classStr = child.props.class
-          const langMatch = typeof classStr === 'string'
-            ? classStr.match(/language-(\S+)/)
-            : null
+          const langMatch = typeof classStr === 'string' ? classStr.match(/language-(\S+)/) : null
           const language = langMatch ? langMatch[1] : ''
 
           // Extract code text from VNode children
@@ -62,10 +67,14 @@ export const Pre = defineComponent({
       }
 
       // Fallback: plain pre
-      return h('pre', {
-        ...attrs,
-        'data-streamdown': 'pre',
-      }, children)
+      return h(
+        'pre',
+        {
+          ...attrs,
+          'data-streamdown': 'pre',
+        },
+        children,
+      )
     }
   },
 })

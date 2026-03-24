@@ -93,9 +93,7 @@ export function createAnimatePlugin(options: AnimatePluginOptions = {}) {
       }
 
       // Split new text into segments (words or chars)
-      const segments = opts.sep === 'char'
-        ? newPart.split('')
-        : newPart.split(/(\s+)/)
+      const segments = opts.sep === 'char' ? newPart.split('') : newPart.split(/(\s+)/)
 
       for (const segment of segments) {
         if (!segment) continue

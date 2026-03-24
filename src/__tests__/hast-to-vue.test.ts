@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { hastToVue } from '../hast-to-vue'
-import { h, defineComponent, createApp } from 'vue'
+import { h, defineComponent } from 'vue'
 import type { Element, Root, Text } from 'hast'
 
 describe('hastToVue', () => {

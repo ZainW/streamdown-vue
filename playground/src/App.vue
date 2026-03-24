@@ -16,9 +16,15 @@ const showCaret = ref(true)
 const caretStyle = ref<CaretStyle>('block')
 const animationEnabled = ref(true)
 
-watch(showCaret, (v) => { caret.value = v ? caretStyle.value : undefined })
-watch(caretStyle, (v) => { if (showCaret.value) caret.value = v })
-watch(animationEnabled, (v) => { animated.value = v })
+watch(showCaret, (v) => {
+  caret.value = v ? caretStyle.value : undefined
+})
+watch(caretStyle, (v) => {
+  if (showCaret.value) caret.value = v
+})
+watch(animationEnabled, (v) => {
+  animated.value = v
+})
 
 const streamingInProgress = ref(false)
 const hasStreamed = ref(false)
@@ -69,11 +75,7 @@ function reset() {
         <h1 class="logo">streamdown-vue</h1>
         <span class="badge">playground</span>
       </div>
-      <a
-        href="https://github.com/zain/streamdown-vue"
-        target="_blank"
-        class="github-link"
-      >
+      <a href="https://github.com/zain/streamdown-vue" target="_blank" class="github-link">
         GitHub
       </a>
     </header>
@@ -83,11 +85,7 @@ function reset() {
       <aside class="sidebar">
         <div class="control-group">
           <h3 class="control-title">Stream</h3>
-          <button
-            class="btn btn-primary"
-            :disabled="streamingInProgress"
-            @click="startStream"
-          >
+          <button class="btn btn-primary" :disabled="streamingInProgress" @click="startStream">
             {{ hasStreamed ? 'Replay' : 'Start Streaming' }}
           </button>
           <button
@@ -412,7 +410,7 @@ body {
   font-size: 15px;
 }
 
-.prose [data-streamdown="heading-1"] {
+.prose [data-streamdown='heading-1'] {
   font-size: 28px;
   font-weight: 700;
   margin-top: 0;
@@ -421,7 +419,7 @@ body {
   line-height: 1.2;
 }
 
-.prose [data-streamdown="heading-2"] {
+.prose [data-streamdown='heading-2'] {
   font-size: 21px;
   font-weight: 600;
   margin-top: 32px;
@@ -430,44 +428,44 @@ body {
   line-height: 1.3;
 }
 
-.prose [data-streamdown="heading-3"] {
+.prose [data-streamdown='heading-3'] {
   font-size: 17px;
   font-weight: 600;
   margin-top: 24px;
   margin-bottom: 8px;
 }
 
-.prose [data-streamdown="paragraph"] {
+.prose [data-streamdown='paragraph'] {
   margin-bottom: 16px;
   color: #d1d1d6;
 }
 
-.prose [data-streamdown="strong"] {
+.prose [data-streamdown='strong'] {
   font-weight: 600;
   color: var(--text);
 }
 
-.prose [data-streamdown="emphasis"] {
+.prose [data-streamdown='emphasis'] {
   font-style: italic;
   color: #b0b0b8;
 }
 
-.prose [data-streamdown="strikethrough"] {
+.prose [data-streamdown='strikethrough'] {
   text-decoration: line-through;
   color: var(--text-muted);
 }
 
-.prose [data-streamdown="link"] {
+.prose [data-streamdown='link'] {
   color: var(--accent);
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: border-color 0.15s;
 }
-.prose [data-streamdown="link"]:hover {
+.prose [data-streamdown='link']:hover {
   border-bottom-color: var(--accent);
 }
 
-.prose [data-streamdown="inline-code"] {
+.prose [data-streamdown='inline-code'] {
   font-family: var(--font-mono);
   font-size: 0.88em;
   background: var(--bg-elevated);
@@ -477,32 +475,32 @@ body {
   color: #e0b0ff;
 }
 
-.prose [data-streamdown="blockquote"] {
+.prose [data-streamdown='blockquote'] {
   border-left: 3px solid var(--accent);
   padding-left: 16px;
   margin: 16px 0;
   color: var(--text-muted);
 }
 
-.prose [data-streamdown="ordered-list"],
-.prose [data-streamdown="unordered-list"] {
+.prose [data-streamdown='ordered-list'],
+.prose [data-streamdown='unordered-list'] {
   margin-bottom: 16px;
   padding-left: 24px;
 }
 
-.prose [data-streamdown="list-item"] {
+.prose [data-streamdown='list-item'] {
   margin-bottom: 4px;
   color: #d1d1d6;
 }
 
-.prose [data-streamdown="hr"] {
+.prose [data-streamdown='hr'] {
   border: none;
   border-top: 1px solid var(--border);
   margin: 24px 0;
 }
 
 /* Code blocks */
-.prose [data-streamdown="code-container"] {
+.prose [data-streamdown='code-container'] {
   background: #111113;
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -510,7 +508,7 @@ body {
   overflow: hidden;
 }
 
-.prose [data-streamdown="code-header"] {
+.prose [data-streamdown='code-header'] {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -519,15 +517,15 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
-.prose [data-streamdown="code-language"] {
+.prose [data-streamdown='code-language'] {
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-muted);
   text-transform: lowercase;
 }
 
-.prose [data-streamdown="code-copy-button"],
-.prose [data-streamdown="code-download-button"] {
+.prose [data-streamdown='code-copy-button'],
+.prose [data-streamdown='code-download-button'] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -537,20 +535,22 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  transition: color 0.15s, background 0.15s;
+  transition:
+    color 0.15s,
+    background 0.15s;
 }
-.prose [data-streamdown="code-copy-button"]:hover,
-.prose [data-streamdown="code-download-button"]:hover {
+.prose [data-streamdown='code-copy-button']:hover,
+.prose [data-streamdown='code-download-button']:hover {
   color: var(--text);
   background: rgba(255, 255, 255, 0.06);
 }
 
-.prose [data-streamdown="code-body"] {
+.prose [data-streamdown='code-body'] {
   overflow-x: auto;
 }
 
 /* Shiki-highlighted output */
-.prose [data-streamdown="code-body"] .shiki {
+.prose [data-streamdown='code-body'] .shiki {
   margin: 0;
   padding: 14px 16px;
   font-family: var(--font-mono);
@@ -559,7 +559,7 @@ body {
   overflow-x: auto;
 }
 
-.prose [data-streamdown="code-body"] .shiki code {
+.prose [data-streamdown='code-body'] .shiki code {
   font-family: inherit;
   background: none;
   border: none;
@@ -567,7 +567,7 @@ body {
 }
 
 /* Plain text fallback (no shiki) */
-.prose [data-streamdown="code-body"] > pre {
+.prose [data-streamdown='code-body'] > pre {
   margin: 0;
   padding: 14px 16px;
   font-family: var(--font-mono);
@@ -576,25 +576,25 @@ body {
   color: #c8c8d0;
 }
 
-.prose [data-streamdown="code-body"] > pre code {
+.prose [data-streamdown='code-body'] > pre code {
   font-family: inherit;
 }
 
 /* Tables */
-.prose [data-streamdown="table-container"] {
+.prose [data-streamdown='table-container'] {
   margin: 16px 0;
   overflow-x: auto;
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
 
-.prose [data-streamdown="table"] {
+.prose [data-streamdown='table'] {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
 }
 
-.prose [data-streamdown="table-header"] {
+.prose [data-streamdown='table-header'] {
   padding: 10px 14px;
   text-align: left;
   font-weight: 600;
@@ -606,27 +606,27 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
-.prose [data-streamdown="table-cell"] {
+.prose [data-streamdown='table-cell'] {
   padding: 10px 14px;
   border-bottom: 1px solid var(--border);
   color: #c8c8d0;
 }
 
-.prose [data-streamdown="table-row"]:last-child [data-streamdown="table-cell"] {
+.prose [data-streamdown='table-row']:last-child [data-streamdown='table-cell'] {
   border-bottom: none;
 }
 
-.prose [data-streamdown="table-row"]:hover [data-streamdown="table-cell"] {
+.prose [data-streamdown='table-row']:hover [data-streamdown='table-cell'] {
   background: rgba(255, 255, 255, 0.02);
 }
 
 /* Caret styling */
-[data-streamdown-caret="block"]::after {
+[data-streamdown-caret='block']::after {
   margin-left: 1px;
   color: var(--accent);
 }
 
-[data-streamdown-caret="circle"]::after {
+[data-streamdown-caret='circle']::after {
   margin-left: 2px;
   color: var(--accent);
 }

@@ -1,7 +1,5 @@
 import type { Component } from 'vue'
-import {
-  H1, H2, H3, H4, H5, H6,
-} from './headings'
+import { H1, H2, H3, H4, H5, H6 } from './headings'
 import { P, Strong, Em, Del, Sub, Sup } from './text'
 import { Ol, Ul, Li } from './lists'
 import { A } from './links'
@@ -9,9 +7,7 @@ import { Blockquote } from './blockquote'
 import { Code, Pre } from './code'
 import { Img } from './image'
 import { Hr } from './hr'
-import {
-  Table, Thead, Tbody, Tr, Th, Td,
-} from './table'
+import { Table, Thead, Tbody, Tr, Th, Td } from './table'
 
 /**
  * Default component map for all markdown elements.

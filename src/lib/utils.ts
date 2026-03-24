@@ -32,11 +32,7 @@ export function defaultUrlTransform(url: string): string {
   if (colon === -1) return url
 
   const protocol = url.slice(0, colon).toLowerCase()
-  if (
-    protocol === 'javascript' ||
-    protocol === 'vbscript' ||
-    protocol === 'data'
-  ) {
+  if (protocol === 'javascript' || protocol === 'vbscript' || protocol === 'data') {
     return ''
   }
 
@@ -47,6 +43,10 @@ export function defaultUrlTransform(url: string): string {
  * Trigger a file download in the browser.
  */
 export function save(content: string, filename: string, mimeType = 'text/plain') {
+  if (typeof document === 'undefined' || typeof URL === 'undefined') {
+    return
+  }
+
   const blob = new Blob([content], { type: mimeType })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')

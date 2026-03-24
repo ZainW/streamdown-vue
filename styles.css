@@ -44,12 +44,12 @@
 }
 
 /* Caret styles */
-[data-streamdown-caret="block"]::after {
+[data-streamdown-caret='block']::after {
   content: '▋';
   animation: sd-blink 1s step-end infinite;
 }
 
-[data-streamdown-caret="circle"]::after {
+[data-streamdown-caret='circle']::after {
   content: '●';
   animation: sd-blink 1s step-end infinite;
   font-size: 0.5em;
@@ -57,7 +57,8 @@
 }
 
 @keyframes sd-blink {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

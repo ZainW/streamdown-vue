@@ -4,9 +4,14 @@ export const Blockquote = defineComponent({
   name: 'Blockquote',
   inheritAttrs: false,
   setup(_, { attrs, slots }: SetupContext) {
-    return () => h('blockquote', {
-      ...attrs,
-      'data-streamdown': 'blockquote',
-    }, slots.default?.())
+    return () =>
+      h(
+        'blockquote',
+        {
+          ...attrs,
+          'data-streamdown': 'blockquote',
+        },
+        slots.default?.(),
+      )
   },
 })

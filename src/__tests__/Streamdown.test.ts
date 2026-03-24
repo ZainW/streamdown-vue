@@ -181,6 +181,18 @@ describe('Streamdown', () => {
       expect(wrapper.find('[data-streamdown-caret="block"]').exists()).toBe(true)
     })
 
+    it('supports circle caret', () => {
+      const wrapper = mount(Streamdown, {
+        props: {
+          content: 'Hello world',
+          mode: 'streaming',
+          isAnimating: true,
+          caret: 'circle',
+        },
+      })
+      expect(wrapper.find('[data-streamdown-caret="circle"]').exists()).toBe(true)
+    })
+
     it('does not show caret when not animating', () => {
       const wrapper = mount(Streamdown, {
         props: {
@@ -191,6 +203,24 @@ describe('Streamdown', () => {
         },
       })
       expect(wrapper.find('[data-streamdown-caret]').exists()).toBe(false)
+    })
+  })
+
+  describe('events', () => {
+    it('emits animation lifecycle events when animation state changes', async () => {
+      const wrapper = mount(Streamdown, {
+        props: {
+          content: 'Hello world',
+          mode: 'streaming',
+          isAnimating: false,
+        },
+      })
+
+      await wrapper.setProps({ isAnimating: true })
+      await wrapper.setProps({ isAnimating: false })
+
+      expect(wrapper.emitted('animation-start')).toHaveLength(1)
+      expect(wrapper.emitted('animation-end')).toHaveLength(1)
     })
   })
 
@@ -247,6 +277,52 @@ describe('Streamdown', () => {
         attrs: { class: 'my-class' },
       })
       expect(wrapper.classes()).toContain('my-class')
+    })
+
+    it('renders GFM task lists', () => {
+      const wrapper = mount(Streamdown, {
+        props: {
+          content: '- [x] Done\n- [ ] Todo',
+          mode: 'static',
+        },
+      })
+
+      const checkboxes = wrapper.findAll('input[type="checkbox"]')
+      const [firstCheckbox, secondCheckbox] = checkboxes.map(
+        (checkbox) => checkbox.element as HTMLInputElement,
+      )
+
+      expect(checkboxes).toHaveLength(2)
+      expect(firstCheckbox.checked).toBe(true)
+      expect(secondCheckbox.checked).toBe(false)
+      expect(checkboxes[0].attributes('disabled')).toBeDefined()
+    })
+
+    it('renders GFM autolinks', () => {
+      const wrapper = mount(Streamdown, {
+        props: {
+          content: 'Visit https://example.com for details',
+          mode: 'static',
+        },
+      })
+
+      const link = wrapper.find('a')
+      expect(link.exists()).toBe(true)
+      expect(link.attributes('href')).toBe('https://example.com')
+      expect(link.text()).toBe('https://example.com')
+    })
+
+    it('sanitizes dangerous URLs by default', () => {
+      const wrapper = mount(Streamdown, {
+        props: {
+          content: '[Click me](javascript:alert(1))',
+          mode: 'static',
+        },
+      })
+
+      const link = wrapper.find('a')
+      expect(link.exists()).toBe(true)
+      expect(link.attributes('href')).toBeUndefined()
     })
   })
 })

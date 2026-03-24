@@ -48,12 +48,7 @@ async function stream() {
 </script>
 
 <template>
-  <Streamdown
-    :content="content"
-    :is-animating="isAnimating"
-    animated
-    caret="block"
-  />
+  <Streamdown :content="content" :is-animating="isAnimating" animated caret="block" />
 </template>
 ```
 
@@ -64,11 +59,7 @@ async function stream() {
 Renders markdown that arrives token-by-token from AI models. Automatically completes incomplete syntax during streaming — unclosed bold, partial code fences, unterminated links — using the [`remend`](https://www.npmjs.com/package/remend) package.
 
 ```vue
-<Streamdown
-  :content="streamingText"
-  :is-animating="true"
-  mode="streaming"
-/>
+<Streamdown :content="streamingText" :is-animating="true" mode="streaming" />
 ```
 
 ### Block Memoization
@@ -84,7 +75,11 @@ Per-word or per-character text animation with three built-in presets. Only new c
 <Streamdown :content="text" :animated="true" :is-animating="true" />
 
 <!-- Blur-in effect -->
-<Streamdown :content="text" :animated="{ animation: 'blurIn', duration: 200 }" :is-animating="true" />
+<Streamdown
+  :content="text"
+  :animated="{ animation: 'blurIn', duration: 200 }"
+  :is-animating="true"
+/>
 
 <!-- Character-by-character -->
 <Streamdown :content="text" :animated="{ sep: 'char' }" :is-animating="true" />
@@ -107,11 +102,10 @@ Blinking cursor that shows where content is being generated.
 Syntax highlighting for 200+ languages via [Shiki](https://shiki.style). Grammars lazy-load on demand. Copy and download buttons included.
 
 ```vue
-<Streamdown
-  :content="text"
-  :shiki-theme="['github-light', 'github-dark']"
-/>
+<Streamdown :content="text" :shiki-theme="['github-light', 'github-dark']" />
 ```
+
+For SSR and Nuxt usage, code blocks render as plain `<pre><code>` on the server and during initial hydration, then enhance to Shiki-highlighted HTML after client mount. This keeps the initial markup deterministic and avoids hydration mismatches.
 
 ### GFM Support
 
@@ -130,10 +124,7 @@ Auto-detects RTL/LTR per block, or set explicitly:
 Override any markdown element with your own Vue component:
 
 ```vue
-<Streamdown
-  :content="text"
-  :components="{ h1: MyCustomHeading, a: MyCustomLink }"
-/>
+<Streamdown :content="text" :components="{ h1: MyCustomHeading, a: MyCustomLink }" />
 ```
 
 ### Security
@@ -142,44 +133,54 @@ Sanitized by default with `rehype-sanitize`. Dangerous protocols (`javascript:`,
 
 ## Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `content` | `string` | required | Markdown content to render |
-| `mode` | `'streaming' \| 'static'` | `'streaming'` | Rendering mode |
-| `isAnimating` | `boolean` | `false` | Whether content is currently streaming |
-| `animated` | `boolean \| AnimateOptions` | `false` | Enable text animation |
-| `caret` | `'block' \| 'circle'` | — | Caret style |
-| `dir` | `'auto' \| 'ltr' \| 'rtl'` | `'auto'` | Text direction |
-| `shikiTheme` | `[string, string]` | `['github-light', 'github-dark']` | Light/dark Shiki themes |
-| `controls` | `ControlsConfig \| boolean` | `true` | Show/hide copy & download buttons |
-| `components` | `Record<string, Component>` | — | Custom component overrides |
-| `parseIncompleteMarkdown` | `boolean` | `true` | Auto-complete incomplete syntax |
-| `remend` | `RemendOptions` | — | Configure which completions to perform |
-| `plugins` | `PluginConfig` | — | Plugin configuration |
-| `remarkPlugins` | `Plugin[]` | `[]` | Additional remark plugins |
-| `rehypePlugins` | `Plugin[]` | `[]` | Additional rehype plugins |
-| `urlTransform` | `(url, key, node) => string` | sanitizer | Transform/filter URLs |
-| `allowedElements` | `string[]` | — | Only allow these HTML elements |
-| `disallowedElements` | `string[]` | — | Remove these HTML elements |
-| `skipHtml` | `boolean` | `false` | Ignore raw HTML in markdown |
+| Prop                      | Type                         | Default                           | Description                            |
+| ------------------------- | ---------------------------- | --------------------------------- | -------------------------------------- |
+| `content`                 | `string`                     | required                          | Markdown content to render             |
+| `mode`                    | `'streaming' \| 'static'`    | `'streaming'`                     | Rendering mode                         |
+| `isAnimating`             | `boolean`                    | `false`                           | Whether content is currently streaming |
+| `animated`                | `boolean \| AnimateOptions`  | `false`                           | Enable text animation                  |
+| `caret`                   | `'block' \| 'circle'`        | —                                 | Caret style                            |
+| `dir`                     | `'auto' \| 'ltr' \| 'rtl'`   | `'auto'`                          | Text direction                         |
+| `shikiTheme`              | `[string, string]`           | `['github-light', 'github-dark']` | Light/dark Shiki themes                |
+| `controls`                | `ControlsConfig \| boolean`  | `true`                            | Show/hide copy & download buttons      |
+| `components`              | `Record<string, Component>`  | —                                 | Custom component overrides             |
+| `parseIncompleteMarkdown` | `boolean`                    | `true`                            | Auto-complete incomplete syntax        |
+| `remend`                  | `RemendOptions`              | —                                 | Configure which completions to perform |
+| `plugins`                 | `PluginConfig`               | —                                 | Plugin configuration                   |
+| `remarkPlugins`           | `Plugin[]`                   | `[]`                              | Additional remark plugins              |
+| `rehypePlugins`           | `Plugin[]`                   | `[]`                              | Additional rehype plugins              |
+| `urlTransform`            | `(url, key, node) => string` | sanitizer                         | Transform/filter URLs                  |
+| `allowedElements`         | `string[]`                   | —                                 | Only allow these HTML elements         |
+| `disallowedElements`      | `string[]`                   | —                                 | Remove these HTML elements             |
+| `skipHtml`                | `boolean`                    | `false`                           | Ignore raw HTML in markdown            |
 
 ### Events
 
-| Event | Description |
-|-------|-------------|
-| `@animation-start` | Fired when `isAnimating` changes to `true` |
-| `@animation-end` | Fired when `isAnimating` changes to `false` |
+| Event              | Description                                 |
+| ------------------ | ------------------------------------------- |
+| `@animation-start` | Fired when `isAnimating` changes to `true`  |
+| `@animation-end`   | Fired when `isAnimating` changes to `false` |
 
 ## Styling
 
 Every element has a `data-streamdown` attribute for CSS targeting:
 
 ```css
-[data-streamdown="heading-1"] { font-size: 2rem; }
-[data-streamdown="inline-code"] { background: #f0f0f0; }
-[data-streamdown="code-container"] { border-radius: 8px; }
-[data-streamdown="table"] { width: 100%; }
-[data-streamdown="link"] { color: blue; }
+[data-streamdown='heading-1'] {
+  font-size: 2rem;
+}
+[data-streamdown='inline-code'] {
+  background: #f0f0f0;
+}
+[data-streamdown='code-container'] {
+  border-radius: 8px;
+}
+[data-streamdown='table'] {
+  width: 100%;
+}
+[data-streamdown='link'] {
+  color: blue;
+}
 ```
 
 Available selectors: `root`, `block`, `heading-1` through `heading-6`, `paragraph`, `strong`, `emphasis`, `strikethrough`, `link`, `inline-code`, `pre`, `code-container`, `code-header`, `code-body`, `code-language`, `code-copy-button`, `code-download-button`, `blockquote`, `ordered-list`, `unordered-list`, `list-item`, `table-container`, `table`, `table-head`, `table-body`, `table-row`, `table-header`, `table-cell`, `image`, `hr`, `subscript`, `superscript`.
@@ -210,6 +211,22 @@ pnpm install
 pnpm run dev
 # → http://localhost:5199
 ```
+
+## Development
+
+This repo uses `pnpm`, `oxfmt`, and `oxlint`. ESLint is not used.
+
+```bash
+pnpm fmt
+pnpm fmt:check
+pnpm lint
+pnpm lint:fix
+pnpm test
+pnpm typecheck
+pnpm build
+```
+
+The root Vite build runs `vite-plugin-oxlint`, so linting is part of the normal build flow and `pnpm build` fails on lint errors.
 
 ## Roadmap
 

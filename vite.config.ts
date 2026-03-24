@@ -1,9 +1,15 @@
 import { defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
+import oxlintPlugin from 'vite-plugin-oxlint'
 import { resolve } from 'path'
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [
+    oxlintPlugin({
+      configFile: '.oxlintrc.json',
+      format: 'stylish',
+      failOnError: command === 'build',
+    }),
     dts({ rollupTypes: true }),
   ],
   build: {
@@ -16,4 +22,4 @@ export default defineConfig({
       external: ['vue', 'shiki'],
     },
   },
-})
+}))

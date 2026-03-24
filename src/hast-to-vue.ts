@@ -1,5 +1,5 @@
 import { h, type VNode, type Component } from 'vue'
-import type { Element, Root, Text, Nodes, Properties } from 'hast'
+import type { Element, Nodes, Properties } from 'hast'
 import { urlAttributes } from 'html-url-attributes'
 
 export interface HastToVueOptions {
@@ -13,7 +13,7 @@ export interface HastToVueOptions {
   passNode?: boolean
 }
 
-const own = {}.hasOwnProperty
+const own = (object: object, key: string) => Object.prototype.hasOwnProperty.call(object, key)
 
 /**
  * Convert HAST properties to Vue-compatible props.
@@ -24,12 +24,12 @@ function hastPropsToVue(
   properties: Properties,
   tagName: string,
   node: Element,
-  options: HastToVueOptions
+  options: HastToVueOptions,
 ): Record<string, any> {
   const props: Record<string, any> = {}
 
   for (const key in properties) {
-    if (!own.call(properties, key)) continue
+    if (!own(properties, key)) continue
     let value = properties[key]
 
     // Skip internal properties
@@ -100,7 +100,7 @@ function shouldIncludeElement(
   node: Element,
   index: number,
   parent: any,
-  options: HastToVueOptions
+  options: HastToVueOptions,
 ): boolean {
   const { allowedElements, disallowedElements, allowElement } = options
 
@@ -126,7 +126,7 @@ function nodeToVue(
   node: Nodes,
   index: number,
   parent: Nodes | null,
-  options: HastToVueOptions
+  options: HastToVueOptions,
 ): VNode | string | (VNode | string)[] | null {
   switch (node.type) {
     case 'root': {
@@ -135,7 +135,7 @@ function nodeToVue(
     }
 
     case 'element': {
-      const element = node as Element
+      const element = node
 
       if (!shouldIncludeElement(element, index, parent, options)) {
         if (options.unwrapDisallowed) {
@@ -145,12 +145,7 @@ function nodeToVue(
       }
 
       const component = options.components?.[element.tagName] ?? element.tagName
-      const props = hastPropsToVue(
-        element.properties || {},
-        element.tagName,
-        element,
-        options
-      )
+      const props = hastPropsToVue(element.properties || {}, element.tagName, element, options)
 
       // Pass the node reference if custom component and passNode enabled
       if (options.passNode && options.components?.[element.tagName]) {
@@ -161,8 +156,20 @@ function nodeToVue(
 
       // Void elements (br, hr, img, input) should not have children
       const voidElements = new Set([
-        'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
-        'link', 'meta', 'param', 'source', 'track', 'wbr',
+        'area',
+        'base',
+        'br',
+        'col',
+        'embed',
+        'hr',
+        'img',
+        'input',
+        'link',
+        'meta',
+        'param',
+        'source',
+        'track',
+        'wbr',
       ])
 
       if (voidElements.has(element.tagName) && children.length === 0) {
@@ -173,7 +180,7 @@ function nodeToVue(
     }
 
     case 'text': {
-      return (node as Text).value
+      return node.value
     }
 
     case 'comment': {
@@ -198,7 +205,7 @@ function nodeToVue(
 function childrenToVue(
   children: Nodes[],
   parent: Nodes,
-  options: HastToVueOptions
+  options: HastToVueOptions,
 ): (VNode | string)[] {
   const result: (VNode | string)[] = []
 

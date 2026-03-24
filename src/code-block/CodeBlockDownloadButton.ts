@@ -14,14 +14,18 @@ export const CodeBlockDownloadButton = defineComponent({
       save(props.code, `code.${ext}`, 'text/plain')
     }
 
-    return () => h('button', {
-      type: 'button',
-      'data-streamdown': 'code-download-button',
-      title: 'Download code',
-      onClick: handleDownload,
-      class: 'inline-flex items-center justify-center rounded p-1 text-muted-foreground hover:text-foreground transition-colors',
-    }, [
-      h(DownloadIcon),
-    ])
+    return () =>
+      h(
+        'button',
+        {
+          type: 'button',
+          'data-streamdown': 'code-download-button',
+          title: 'Download code',
+          onClick: handleDownload,
+          class:
+            'inline-flex items-center justify-center rounded p-1 text-muted-foreground hover:text-foreground transition-colors',
+        },
+        [h(DownloadIcon)],
+      )
   },
 })

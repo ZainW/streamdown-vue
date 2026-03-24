@@ -1,4 +1,4 @@
-import { Lexer, type Token } from 'marked'
+import { Lexer } from 'marked'
 
 /**
  * Parse markdown content into independent blocks.

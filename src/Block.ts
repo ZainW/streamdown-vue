@@ -27,7 +27,9 @@ export const Block = defineComponent({
       default: null,
     },
     urlTransform: {
-      type: Function as PropType<(url: string, key: string, node: any) => string | null | undefined>,
+      type: Function as PropType<
+        (url: string, key: string, node: any) => string | null | undefined
+      >,
       default: undefined,
     },
     allowedElements: {

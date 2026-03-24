@@ -21,11 +21,7 @@ export function hasIncompleteCodeFence(text: string): boolean {
     } else {
       // Check for closing fence (must be same char and at least same count)
       const closeMatch = trimmed.match(/^(`{3,}|~{3,})\s*$/)
-      if (
-        closeMatch &&
-        closeMatch[1][0] === fenceChar &&
-        closeMatch[1].length >= fenceCount
-      ) {
+      if (closeMatch && closeMatch[1][0] === fenceChar && closeMatch[1].length >= fenceCount) {
         inCodeFence = false
       }
     }
@@ -45,11 +41,7 @@ export function hasTable(text: string): boolean {
   for (let i = 0; i < lines.length - 1; i++) {
     const line = lines[i]
     const nextLine = lines[i + 1]
-    if (
-      line.includes('|') &&
-      nextLine.includes('|') &&
-      /\|[\s:]*-{3,}[\s:]*\|/.test(nextLine)
-    ) {
+    if (line.includes('|') && nextLine.includes('|') && /\|[\s:]*-{3,}[\s:]*\|/.test(nextLine)) {
       return true
     }
   }

@@ -1,11 +1,4 @@
-import {
-  defineComponent,
-  h,
-  computed,
-  provide,
-  watch,
-  type PropType,
-} from 'vue'
+import { defineComponent, h, computed, provide, watch, type PropType } from 'vue'
 import remend from 'remend'
 import type { RemendOptions } from 'remend'
 import { Block } from './Block'
@@ -96,7 +89,9 @@ export const Streamdown = defineComponent({
     unwrapDisallowed: { type: Boolean, default: false },
     skipHtml: { type: Boolean, default: false },
     urlTransform: {
-      type: Function as PropType<(url: string, key: string, node: any) => string | null | undefined>,
+      type: Function as PropType<
+        (url: string, key: string, node: any) => string | null | undefined
+      >,
       default: defaultUrlTransform,
     },
     allowedTags: {
@@ -123,11 +118,12 @@ export const Streamdown = defineComponent({
     // Children call useStreamdownContext() which unwraps this computed ref,
     // so they always see the latest values when props change.
     const streamdownContext = computed<StreamdownContext>(() => ({
-      controls: typeof props.controls === 'boolean'
-        ? props.controls
-          ? { code: { copy: true, download: true }, table: { copy: true, download: true } }
-          : { code: { copy: false, download: false }, table: { copy: false, download: false } }
-        : props.controls,
+      controls:
+        typeof props.controls === 'boolean'
+          ? props.controls
+            ? { code: { copy: true, download: true }, table: { copy: true, download: true } }
+            : { code: { copy: false, download: false }, table: { copy: false, download: false } }
+          : props.controls,
       isAnimating: props.isAnimating,
       mode: props.mode,
       shikiTheme: props.shikiTheme,
@@ -139,17 +135,19 @@ export const Streamdown = defineComponent({
     provide(PrefixKey, props.prefix)
 
     // Watch for animation state changes
-    watch(() => props.isAnimating, (newVal, oldVal) => {
-      if (newVal && !oldVal) emit('animation-start')
-      if (!newVal && oldVal) emit('animation-end')
-    })
+    watch(
+      () => props.isAnimating,
+      (newVal, oldVal) => {
+        if (newVal && !oldVal) emit('animation-start')
+        if (!newVal && oldVal) emit('animation-end')
+      },
+    )
 
     // Create animate plugin if animation is enabled
     const animatePlugin = computed(() => {
       if (!props.animated) return null
-      const animOpts: AnimatePluginOptions = typeof props.animated === 'object'
-        ? props.animated
-        : {}
+      const animOpts: AnimatePluginOptions =
+        typeof props.animated === 'object' ? props.animated : {}
       return createAnimatePlugin(animOpts)
     })
 
@@ -175,37 +173,41 @@ export const Streamdown = defineComponent({
     return () => {
       const blocks = processedBlocks.value
 
-      return h('div', {
-        ...attrs,
-        'data-streamdown': 'root',
-      }, blocks.map((blockContent, index) => {
-        // Determine text direction per block
-        let blockDir: 'ltr' | 'rtl' | undefined
-        if (props.dir === 'auto') {
-          blockDir = detectTextDirection(blockContent)
-        } else if (props.dir !== undefined) {
-          blockDir = props.dir
-        }
+      return h(
+        'div',
+        {
+          ...attrs,
+          'data-streamdown': 'root',
+        },
+        blocks.map((blockContent, index) => {
+          // Determine text direction per block
+          let blockDir: 'ltr' | 'rtl' | undefined
+          if (props.dir === 'auto') {
+            blockDir = detectTextDirection(blockContent)
+          } else if (props.dir !== undefined) {
+            blockDir = props.dir
+          }
 
-        return h(Block, {
-          key: `block-${index}-${blockContent.slice(0, 32)}`,
-          content: blockContent,
-          isLastBlock: index === blocks.length - 1,
-          isAnimating: props.isAnimating,
-          components: mergedComponents.value,
-          remarkPlugins: props.remarkPlugins,
-          rehypePlugins: props.rehypePlugins,
-          urlTransform: props.urlTransform,
-          allowedElements: props.allowedElements,
-          disallowedElements: props.disallowedElements,
-          allowElement: props.allowElement,
-          unwrapDisallowed: props.unwrapDisallowed,
-          skipHtml: props.skipHtml,
-          dir: blockDir,
-          caret: props.caret,
-          animatePlugin: animatePlugin.value,
-        })
-      }))
+          return h(Block, {
+            key: `block-${index}-${blockContent.slice(0, 32)}`,
+            content: blockContent,
+            isLastBlock: index === blocks.length - 1,
+            isAnimating: props.isAnimating,
+            components: mergedComponents.value,
+            remarkPlugins: props.remarkPlugins,
+            rehypePlugins: props.rehypePlugins,
+            urlTransform: props.urlTransform,
+            allowedElements: props.allowedElements,
+            disallowedElements: props.disallowedElements,
+            allowElement: props.allowElement,
+            unwrapDisallowed: props.unwrapDisallowed,
+            skipHtml: props.skipHtml,
+            dir: blockDir,
+            caret: props.caret,
+            animatePlugin: animatePlugin.value,
+          })
+        }),
+      )
     }
   },
 })

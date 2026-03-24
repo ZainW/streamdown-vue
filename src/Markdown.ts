@@ -33,10 +33,7 @@ const sanitizeSchema = {
       // Allow data-* attributes
       ['data*', /^data-/],
     ],
-    code: [
-      ...(defaultSchema.attributes?.['code'] || []),
-      'className',
-    ],
+    code: [...(defaultSchema.attributes?.['code'] || []), 'className'],
   },
 }
 
@@ -45,7 +42,7 @@ const sanitizeSchema = {
  */
 export function processMarkdown(
   markdown: string,
-  options: MarkdownOptions = {}
+  options: MarkdownOptions = {},
 ): (VNode | string)[] {
   const {
     remarkPlugins = [],
@@ -60,9 +57,7 @@ export function processMarkdown(
   } = options
 
   // Build the unified processor
-  let processor = unified()
-    .use(remarkParse)
-    .use(remarkGfm)
+  let processor = unified().use(remarkParse).use(remarkGfm)
 
   // Apply custom remark plugins
   for (const plugin of remarkPlugins) {

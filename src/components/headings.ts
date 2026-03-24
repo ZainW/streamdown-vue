@@ -5,10 +5,15 @@ function createHeading(level: number) {
     name: `H${level}`,
     inheritAttrs: false,
     setup(_, { attrs, slots }: SetupContext) {
-      return () => h(`h${level}`, {
-        ...attrs,
-        'data-streamdown': `heading-${level}`,
-      }, slots.default?.())
+      return () =>
+        h(
+          `h${level}`,
+          {
+            ...attrs,
+            'data-streamdown': `heading-${level}`,
+          },
+          slots.default?.(),
+        )
     },
   })
 }
