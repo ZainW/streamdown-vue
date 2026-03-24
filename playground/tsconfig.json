@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "jsx": "preserve",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "paths": {
+      "streamdown-vue": ["../src/index.ts"],
+      "streamdown-vue/styles.css": ["../styles.css"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.vue"]
+}

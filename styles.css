@@ -1,0 +1,66 @@
+/* Streamdown Vue - Animation Styles */
+
+/* fadeIn animation (default) */
+@keyframes sd-fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* blurIn animation - opacity with blur-to-sharp effect */
+@keyframes sd-blurIn {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* slideUp animation - fade-in with subtle upward movement */
+@keyframes sd-slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animated word/char spans */
+[data-sd-animate] {
+  animation-name: var(--sd-animation, sd-fadeIn);
+  animation-duration: var(--sd-duration, 150ms);
+  animation-timing-function: var(--sd-easing, ease);
+  animation-fill-mode: forwards;
+  opacity: 0;
+}
+
+/* Caret styles */
+[data-streamdown-caret="block"]::after {
+  content: '▋';
+  animation: sd-blink 1s step-end infinite;
+}
+
+[data-streamdown-caret="circle"]::after {
+  content: '●';
+  animation: sd-blink 1s step-end infinite;
+  font-size: 0.5em;
+  vertical-align: middle;
+}
+
+@keyframes sd-blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
