@@ -36,14 +36,31 @@ interface StreamdownPlugin {
   component: Component
   remarkPlugins?: unified.Plugin[]
   rehypePlugins?: unified.Plugin[]
+  sanitizeSchema?: Partial<SanitizeSchema>
 }
 ```
 
 - **`name`** — identifier used as key in the plugins object
-- **`match`** — claims a HAST element node during rendering; first plugin to match wins
-- **`component`** — Vue component that renders matched nodes; receives HAST node data as props
+- **`match`** — claims a HAST element node during rendering; most-specific match wins (see Plugin Matching Order)
+- **`component`** — Vue component that renders matched nodes; receives `PluginComponentProps` (see below)
 - **`remarkPlugins`** — optional remark extensions merged after remark-gfm
 - **`rehypePlugins`** — optional rehype extensions merged after rehype-raw, before rehype-sanitize
+- **`sanitizeSchema`** — optional schema extensions merged into rehype-sanitize (e.g., to allow SVG elements)
+
+**`StreamdownPlugin` is exported from the main entry point** (`streamdown-vue3`) so third-party plugin authors can type against it.
+
+### Plugin Component Props
+
+All plugin components receive a standard prop interface:
+
+```ts
+interface PluginComponentProps {
+  node: HastElement        // the raw HAST element node
+  children: VNode[]        // pre-rendered child VNodes
+}
+```
+
+Plugin components are responsible for extracting what they need from the HAST node. For example, the code plugin's component extracts `language`, `code`, and `meta` from the `<pre>` node's `<code>` child rather than expecting them as separate props.
 
 Each plugin sub-path exports a factory function so consumers can pass options:
 
@@ -56,38 +73,67 @@ export function mermaid(options?: MermaidPluginOptions): StreamdownPlugin
 
 ### HAST-to-Vue rendering (hast-to-vue.ts)
 
-Plugin matching runs before the component map lookup:
+Plugins are passed to `hastToVue` via the `HastToVueOptions` object (not via provide/inject, since `hastToVue` is a pure function). Plugin matching runs before the component map lookup:
 
 ```ts
-for (const plugin of plugins) {
+// Options now includes: plugins?: StreamdownPlugin[]
+for (const plugin of sortedPlugins) {
   if (plugin.match(element)) {
-    return h(plugin.component, { node: element, ...attrs }, children)
+    return h(plugin.component, { node: element }, children)
   }
 }
 const component = options.components?.[element.tagName] ?? element.tagName
 ```
 
-### Markdown pipeline (Markdown.ts)
+### Plugin Matching Order
 
-Pipeline extensions collected from plugins and merged at fixed positions:
+Plugins are sorted by specificity before matching: plugins whose `match` checks more conditions (e.g., mermaid checks tag name + language class) run before plugins with broader matches (e.g., code checks tag name + any code child). This prevents the code plugin from swallowing mermaid fences.
+
+Implementation: the plugins array is iterated in **reverse insertion order** for matching — later entries match first. Consumers who want mermaid to take precedence over code just list code before mermaid (which is the natural order):
 
 ```ts
-const extraRemarkPlugins = plugins.flatMap(p => p.remarkPlugins ?? [])
-const extraRehypePlugins = plugins.flatMap(p => p.rehypePlugins ?? [])
+:plugins="{ code: code(), mermaid: mermaid() }"
+// Matching order: mermaid first (more specific), then code
+```
+
+This is simple, explicit, and matches the common intuition that "later overrides earlier."
+
+### Markdown pipeline (Markdown.ts)
+
+Two separate insertion points for rehype plugins to preserve backward compatibility:
+
+```ts
+const pluginRemarkPlugins = plugins.flatMap(p => p.remarkPlugins ?? [])
+const pluginRehypePlugins = plugins.flatMap(p => p.rehypePlugins ?? [])
+const pluginSanitizeExtensions = plugins.map(p => p.sanitizeSchema).filter(Boolean)
+
+// Merge sanitize schema
+// Array-valued fields (e.g., attributes lists) are concatenated, not replaced.
+// Use deepmerge with arrayMerge: concatMerge, or manually spread attribute arrays.
+const mergedSchema = deepMerge(defaultSchema, ...pluginSanitizeExtensions)
 
 const processor = unified()
   .use(remarkParse)
   .use(remarkGfm)
-  .use(...extraRemarkPlugins)
+  .use(...pluginRemarkPlugins)              // plugin remark extensions
   .use(remarkRehype, { allowDangerousHtml: true })
   .use(rehypeRaw)
-  .use(...extraRehypePlugins)
-  .use(rehypeSanitize, schema)
+  .use(...pluginRehypePlugins)              // plugin rehype extensions (before sanitize)
+  .use(rehypeSanitize, mergedSchema)        // sanitize with extended schema
+  .use(...consumerRehypePlugins)            // consumer-provided rehype plugins (after sanitize, backward compat)
 ```
+
+Plugin-provided rehype plugins run **before** sanitization (so the sanitizer validates their output). Consumer-provided rehype plugins via the Streamdown `rehypePlugins` prop continue to run **after** sanitization, preserving existing behavior.
+
+### Processor cache key
+
+The processor cache key (`getCachedProcessor` in Markdown.ts) must account for active plugins. The cache key includes plugin names and a hash of plugin options so that switching plugins between renders produces a new processor.
 
 ### Plugin data flow
 
-Plugins are provided from `Streamdown.ts` via Vue's provide/inject. The existing `usePlugins` composable is updated to work with `Record<string, StreamdownPlugin>`. Both the HAST renderer and markdown processor read from this context.
+Plugins are provided from `Streamdown.ts` via Vue's provide/inject for components that need them. The existing `usePlugins` composable is updated: its return type changes from `PluginConfig` to `Record<string, StreamdownPlugin>`, and the injection key is updated accordingly. The composable remains exported from the main entry point.
+
+For the HAST renderer and markdown processor (which are pure functions), plugins are passed explicitly via function arguments.
 
 ## What Moves Out of Core
 
@@ -116,12 +162,14 @@ src/
       index.ts              # exports mermaid() factory
       MermaidBlock.ts        # Mermaid renderer component
   types/
-    plugin.ts               # StreamdownPlugin interface
+    plugin.ts               # StreamdownPlugin, PluginComponentProps interfaces
 ```
 
 ## Code Plugin
 
 Moves existing code block system into `src/plugins/code/`. Shiki remains a dynamic import and optional peer dependency.
+
+The code plugin's component wraps `CodeBlock` with an adapter that extracts `language`, `code`, and `meta` from the raw HAST node, since `CodeBlock` expects these as structured props rather than a raw HAST node.
 
 ```ts
 export interface CodePluginOptions {
@@ -133,10 +181,12 @@ export function code(options?: CodePluginOptions): StreamdownPlugin {
   return {
     name: 'code',
     match: (node) => node.tagName === 'pre' && hasCodeChild(node),
-    component: CodeBlock, // wired with options via provide or props
+    component: CodePluginAdapter, // extracts props from HAST, renders CodeBlock
   }
 }
 ```
+
+`CodePluginAdapter` replaces the current `Pre` component's role: it extracts `language`, `code`, and `meta` from the HAST `<pre><code>` structure and passes them to `CodeBlock`.
 
 ## Mermaid Plugin
 
@@ -152,8 +202,10 @@ export function mermaid(options?: MermaidPluginOptions): StreamdownPlugin {
   return {
     name: 'mermaid',
     match: (node) => {
+      const child = node.children?.[0]
       return node.tagName === 'pre'
-        && node.children?.[0]?.properties?.className?.includes('language-mermaid')
+        && child?.type === 'element'   // type-guard: ensure child is an Element, not a text node
+        && child.properties?.className?.includes('language-mermaid')
     },
     component: MermaidBlock,
   }
@@ -166,6 +218,7 @@ export function mermaid(options?: MermaidPluginOptions): StreamdownPlugin {
 - Calls `mermaid.render()`, displays SVG via `v-html`
 - During streaming (block incomplete): shows raw source in plain `<pre>` to avoid repeated render calls on partial input
 - On error: falls back to raw source with error indicator
+- Mermaid styles are scoped to the plugin component (no additions to core `styles.css`)
 
 ## Build Configuration
 
@@ -187,7 +240,11 @@ build: {
 }
 ```
 
-### Package.json exports
+### Type declarations
+
+The current build uses `vite-plugin-dts` with `rollupTypes: true`, which produces a single bundled `.d.ts` file. This is incompatible with multiple entry points.
+
+**Solution:** Disable `rollupTypes` and use `vue-tsc --emitDeclarationOnly` to emit per-file `.d.ts` output. The exports map paths are adjusted to match the actual emit structure:
 
 ```json
 "exports": {
@@ -197,15 +254,17 @@ build: {
   },
   "./code": {
     "import": "./dist/code.js",
-    "types": "./dist/code.d.ts"
+    "types": "./dist/plugins/code/index.d.ts"
   },
   "./mermaid": {
     "import": "./dist/mermaid.js",
-    "types": "./dist/mermaid.d.ts"
+    "types": "./dist/plugins/mermaid/index.d.ts"
   },
   "./styles.css": "./styles.css"
 }
 ```
+
+Alternative: investigate whether `vite-plugin-dts` v4 handles multi-entry `rollupTypes`. If so, the flat `./dist/code.d.ts` paths can be used. Spike this during implementation.
 
 ### Peer dependencies
 
@@ -226,7 +285,9 @@ build: {
 1. Code fences render as plain `<pre><code>` without the `code` plugin
 2. `useCodeBlockContext` moves from `streamdown-vue3` to `streamdown-vue3/code`
 3. Code block sub-components move from `streamdown-vue3` to `streamdown-vue3/code`
-4. `PluginConfig` type replaced by `Record<string, StreamdownPlugin>`
+4. `PluginConfig` type replaced by `Record<string, StreamdownPlugin>`; `usePlugins` composable return type changes accordingly
+5. `shiki` moves from `optionalDependencies` to `peerDependencies` with `optional: true` (different install behavior: pnpm/npm will warn if missing rather than silently skipping)
+6. Consumer-provided `rehypePlugins` continue to run after sanitization (no change), but plugin-system-provided rehype plugins run before sanitization (new behavior)
 
 ### Migration
 
@@ -244,6 +305,9 @@ Version bump: 0.1.x → 0.2.0 (or 1.0.0).
 
 - Existing code block tests move to test the code plugin in isolation
 - New tests for plugin registration, matching, and fallback behavior
+- New tests for plugin matching order (mermaid takes precedence over code for mermaid fences)
 - New tests for mermaid plugin (mock mermaid library)
 - Integration test: Streamdown with no plugins renders code fences as plain `<pre><code>`
 - Integration test: Streamdown with code plugin renders full CodeBlock UI
+- Integration test: Streamdown with both plugins renders mermaid fences as MermaidBlock and regular fences as CodeBlock
+- Test processor cache invalidation when plugins change
