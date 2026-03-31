@@ -16,9 +16,9 @@ import type {
   TextDirection,
   AnimateOptions,
   ControlsConfig,
-  PluginConfig,
   StreamdownContext,
 } from './types'
+import type { StreamdownPlugin } from './types/plugin'
 import type { Component } from 'vue'
 import type { Plugin as UnifiedPlugin } from 'unified'
 
@@ -62,7 +62,7 @@ export const Streamdown = defineComponent({
       default: true,
     },
     plugins: {
-      type: Object as PropType<PluginConfig>,
+      type: Object as PropType<Record<string, StreamdownPlugin>>,
       default: undefined,
     },
     icons: {
@@ -111,7 +111,7 @@ export const Streamdown = defineComponent({
       default: () => [],
     },
   },
-  emits: ['animation-start', 'animation-end'],
+  emits: ['animation-start', 'animation-end', 'error'],
   inheritAttrs: false,
   setup(props, { emit, attrs }) {
     // Provide reactive context to child components.
@@ -151,6 +151,9 @@ export const Streamdown = defineComponent({
       return createAnimatePlugin(animOpts)
     })
 
+    // Convert plugins record to array for passing to Block/processMarkdown
+    const pluginsList = computed(() => (props.plugins ? Object.values(props.plugins) : []))
+
     // Merge user components with defaults
     const mergedComponents = computed(() => ({
       ...defaultComponents,
@@ -178,6 +181,9 @@ export const Streamdown = defineComponent({
         {
           ...attrs,
           'data-streamdown': 'root',
+          role: 'log',
+          'aria-live': props.isAnimating ? 'polite' : undefined,
+          'aria-atomic': false,
         },
         blocks.map((blockContent, index) => {
           // Determine text direction per block
@@ -205,6 +211,8 @@ export const Streamdown = defineComponent({
             dir: blockDir,
             caret: props.caret,
             animatePlugin: animatePlugin.value,
+            plugins: pluginsList.value,
+            onError: (err: unknown) => emit('error', err),
           })
         }),
       )

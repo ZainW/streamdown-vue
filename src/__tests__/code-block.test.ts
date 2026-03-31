@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { Streamdown } from '../Streamdown'
+import { code } from '../plugins/code'
 
 describe('Code Blocks', () => {
   it('renders a code block with language header', () => {
@@ -8,6 +9,7 @@ describe('Code Blocks', () => {
       props: {
         content: '```javascript\nconst x = 1;\n```',
         mode: 'static',
+        plugins: { code: code() },
       },
     })
     expect(wrapper.find('[data-streamdown="code-container"]').exists()).toBe(true)
@@ -20,6 +22,7 @@ describe('Code Blocks', () => {
       props: {
         content: '```python\nprint("hello")\n```',
         mode: 'static',
+        plugins: { code: code() },
       },
     })
     expect(wrapper.find('[data-streamdown="code-body"]').exists()).toBe(true)
@@ -31,6 +34,7 @@ describe('Code Blocks', () => {
       props: {
         content: 'Use `inline` code',
         mode: 'static',
+        plugins: { code: code() },
       },
     })
     // Inline code should NOT have a code block container
@@ -43,6 +47,7 @@ describe('Code Blocks', () => {
       props: {
         content: '```\nplain text\n```',
         mode: 'static',
+        plugins: { code: code() },
       },
     })
     expect(wrapper.find('[data-streamdown="code-container"]').exists()).toBe(true)
@@ -53,6 +58,7 @@ describe('Code Blocks', () => {
       props: {
         content: '```js\ncode\n```',
         mode: 'static',
+        plugins: { code: code() },
       },
     })
     expect(wrapper.find('[data-streamdown="code-copy-button"]').exists()).toBe(true)
@@ -63,6 +69,7 @@ describe('Code Blocks', () => {
       props: {
         content: '```js\ncode\n```',
         mode: 'static',
+        plugins: { code: code() },
       },
     })
     expect(wrapper.find('[data-streamdown="code-download-button"]').exists()).toBe(true)
@@ -74,6 +81,7 @@ describe('Code Blocks', () => {
         content: '```js\ncode\n```',
         mode: 'static',
         controls: false,
+        plugins: { code: code() },
       },
     })
     expect(wrapper.find('[data-streamdown="code-copy-button"]').exists()).toBe(false)
@@ -96,6 +104,7 @@ describe('Code Blocks', () => {
         props: {
           content: '```js\nconsole.log("hi")\n```',
           mode: 'static',
+          plugins: { code: code() },
         },
       })
 
@@ -128,6 +137,7 @@ describe('Code Blocks', () => {
         props: {
           content: '```ts\nconst value = 1\n```',
           mode: 'static',
+          plugins: { code: code() },
         },
       })
 
@@ -143,5 +153,19 @@ describe('Code Blocks', () => {
       appendChild.mockRestore()
       removeChild.mockRestore()
     }
+  })
+
+  it('renders code fences as plain pre/code without code plugin', () => {
+    const wrapper = mount(Streamdown, {
+      props: {
+        content: '```javascript\nconst x = 1;\n```',
+        mode: 'static',
+        // No plugins
+      },
+    })
+    expect(wrapper.find('pre').exists()).toBe(true)
+    expect(wrapper.find('code').exists()).toBe(true)
+    // Should NOT have code block UI
+    expect(wrapper.find('[data-streamdown="code-container"]').exists()).toBe(false)
   })
 })

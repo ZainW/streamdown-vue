@@ -1,6 +1,6 @@
 import { defineComponent, h } from 'vue'
-import { DownloadIcon } from '../icons'
-import { save } from '../lib/utils'
+import { DownloadIcon } from '../icons/index'
+import { save } from '../../../lib/utils'
 
 export const CodeBlockDownloadButton = defineComponent({
   name: 'CodeBlockDownloadButton',
@@ -21,9 +21,9 @@ export const CodeBlockDownloadButton = defineComponent({
           type: 'button',
           'data-streamdown': 'code-download-button',
           title: 'Download code',
+          'aria-label': 'Download code',
           onClick: handleDownload,
-          class:
-            'inline-flex items-center justify-center rounded p-1 text-muted-foreground hover:text-foreground transition-colors',
+          class: 'inline-flex items-center justify-center rounded p-1 transition-colors',
         },
         [h(DownloadIcon)],
       )

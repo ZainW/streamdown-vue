@@ -10,7 +10,7 @@ export const CodeBlockContainer = defineComponent({
         {
           ...attrs,
           'data-streamdown': 'code-container',
-          class: 'rounded-lg border border-border bg-muted/50 overflow-hidden my-4',
+          class: 'rounded-lg border overflow-hidden my-4',
         },
         slots.default?.(),
       )

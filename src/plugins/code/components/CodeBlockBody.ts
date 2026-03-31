@@ -1,5 +1,5 @@
 import { defineComponent, h, onMounted, ref, watch } from 'vue'
-import { useStreamdownContext } from '../composables/useStreamdownContext'
+import { useStreamdownContext } from '../../../composables/useStreamdownContext'
 
 export const CodeBlockBody = defineComponent({
   name: 'CodeBlockBody',

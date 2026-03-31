@@ -40,13 +40,10 @@ export interface CustomRenderer {
   component: Component
 }
 
-export interface PluginConfig {
-  renderers?: CustomRenderer[]
-  code?: any
-  math?: any
-  mermaid?: any
-  cjk?: any
-}
+export type { StreamdownPlugin, PluginComponentProps } from './plugin'
+
+/** @deprecated Use Record<string, StreamdownPlugin> instead */
+export type PluginConfig = Record<string, import('./plugin').StreamdownPlugin>
 
 export interface StreamdownProps {
   content: string

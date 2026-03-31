@@ -1,6 +1,6 @@
 {
   "name": "streamdown-vue3",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Vue 3 component for rendering AI-streamed markdown with incomplete syntax handling, block memoization, and animation",
   "keywords": [
     "ai",
@@ -20,6 +20,7 @@
     "dist",
     "styles.css"
   ],
+  "sideEffects": false,
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -28,6 +29,14 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./code": {
+      "import": "./dist/code.js",
+      "types": "./dist/plugins/code/index.d.ts"
+    },
+    "./mermaid": {
+      "import": "./dist/mermaid.js",
+      "types": "./dist/plugins/mermaid/index.d.ts"
     },
     "./styles.css": "./styles.css"
   },
@@ -72,9 +81,16 @@
     "vue-tsc": "^3.2.6"
   },
   "peerDependencies": {
+    "mermaid": "^11.0.0",
+    "shiki": "^4.0.0",
     "vue": "^3.3.0"
   },
-  "optionalDependencies": {
-    "shiki": "^4.0.0"
+  "peerDependenciesMeta": {
+    "shiki": {
+      "optional": true
+    },
+    "mermaid": {
+      "optional": true
+    }
   }
 }

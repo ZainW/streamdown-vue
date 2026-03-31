@@ -4,7 +4,7 @@ import { P, Strong, Em, Del, Sub, Sup } from './text'
 import { Ol, Ul, Li } from './lists'
 import { A } from './links'
 import { Blockquote } from './blockquote'
-import { Code, Pre } from './code'
+import { Code } from './code'
 import { Img } from './image'
 import { Hr } from './hr'
 import { Table, Thead, Tbody, Tr, Th, Td } from './table'
@@ -32,7 +32,6 @@ export const defaultComponents: Record<string, Component> = {
   a: A,
   blockquote: Blockquote,
   code: Code,
-  pre: Pre,
   img: Img,
   hr: Hr,
   table: Table,

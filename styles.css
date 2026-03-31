@@ -1,4 +1,51 @@
-/* Streamdown Vue - Animation Styles */
+/* Streamdown Vue - Styles */
+
+/* Default theme variables — override these or provide your own via shadcn/Nuxt UI/etc. */
+[data-streamdown='root'] {
+  --sd-border: #e5e7eb;
+  --sd-muted: #f3f4f6;
+  --sd-muted-foreground: #6b7280;
+  --sd-foreground: #111827;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-streamdown='root'] {
+    --sd-border: #374151;
+    --sd-muted: #1f2937;
+    --sd-muted-foreground: #9ca3af;
+    --sd-foreground: #f9fafb;
+  }
+}
+
+/* Code block component styles */
+[data-streamdown='code-container'] {
+  border-color: var(--sd-border);
+  background: color-mix(in srgb, var(--sd-muted) 50%, transparent);
+}
+
+[data-streamdown='code-header'] {
+  border-color: var(--sd-border);
+}
+
+[data-streamdown='code-language'] {
+  color: var(--sd-muted-foreground);
+}
+
+[data-streamdown='code-copy-button'],
+[data-streamdown='code-download-button'] {
+  color: var(--sd-muted-foreground);
+}
+
+[data-streamdown='code-copy-button']:hover,
+[data-streamdown='code-download-button']:hover {
+  color: var(--sd-foreground);
+}
+
+[data-streamdown='code-skeleton'] > div {
+  background: var(--sd-muted);
+}
+
+/* Animation Styles */
 
 /* fadeIn animation (default) */
 @keyframes sd-fadeIn {

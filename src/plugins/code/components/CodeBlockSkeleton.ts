@@ -11,9 +11,9 @@ export const CodeBlockSkeleton = defineComponent({
           class: 'animate-pulse p-4 space-y-2',
         },
         [
-          h('div', { class: 'h-4 bg-muted rounded w-3/4' }),
-          h('div', { class: 'h-4 bg-muted rounded w-1/2' }),
-          h('div', { class: 'h-4 bg-muted rounded w-5/6' }),
+          h('div', { class: 'h-4 rounded w-3/4' }),
+          h('div', { class: 'h-4 rounded w-1/2' }),
+          h('div', { class: 'h-4 rounded w-5/6' }),
         ],
       )
   },

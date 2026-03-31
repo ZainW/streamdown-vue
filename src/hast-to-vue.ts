@@ -1,6 +1,7 @@
 import { h, type VNode, type Component } from 'vue'
 import type { Element, Nodes, Properties } from 'hast'
 import { urlAttributes } from 'html-url-attributes'
+import type { StreamdownPlugin } from './types/plugin'
 
 export interface HastToVueOptions {
   components?: Record<string, Component | string>
@@ -11,6 +12,7 @@ export interface HastToVueOptions {
   unwrapDisallowed?: boolean
   skipHtml?: boolean
   passNode?: boolean
+  plugins?: StreamdownPlugin[]
 }
 
 const own = (object: object, key: string) => Object.prototype.hasOwnProperty.call(object, key)
@@ -142,6 +144,21 @@ function nodeToVue(
           return childrenToVue(element.children as Nodes[], element, options)
         }
         return null
+      }
+
+      // Check plugins in reverse order (last registered wins)
+      if (options.plugins?.length) {
+        for (let i = options.plugins.length - 1; i >= 0; i--) {
+          const plugin = options.plugins[i]
+          if (plugin.match(element)) {
+            const children = childrenToVue(element.children as Nodes[], element, options)
+            return h(
+              plugin.component,
+              { node: element },
+              children.length > 0 ? children : undefined,
+            )
+          }
+        }
       }
 
       const component = options.components?.[element.tagName] ?? element.tagName

@@ -4,8 +4,6 @@ A Vue 3 component for rendering AI-streamed markdown. Handles incomplete syntax,
 
 > **Community port of [Streamdown](https://streamdown.ai) by Vercel.** The original is a React component — this brings the same streaming markdown experience to Vue. Full credit to the Streamdown team for the incredible original library and the framework-agnostic tools (`remend`, `remark-gfm`, `rehype-sanitize`, etc.) that made this port possible.
 
-> **Vibe-coded.** This library was built entirely through AI-assisted development (Claude Code). It works, it's tested, but it hasn't been battle-tested in production yet. PRs, bug reports, and real-world usage feedback are very welcome.
-
 ## Install
 
 ```bash
@@ -20,16 +18,24 @@ For syntax highlighting, also install Shiki (optional):
 pnpm add shiki
 ```
 
+Import the stylesheet in your app entry or component:
+
+```ts
+import 'streamdown-vue3/styles.css'
+```
+
 ## Quick Start
 
 ```vue
 <script setup>
 import { ref } from 'vue'
 import { Streamdown } from 'streamdown-vue3'
+import { code } from 'streamdown-vue3/code'
 import 'streamdown-vue3/styles.css'
 
 const content = ref('')
 const isAnimating = ref(true)
+const plugins = { code: code() }
 
 // Simulate streaming from an AI model
 async function stream() {
@@ -48,7 +54,46 @@ async function stream() {
 </script>
 
 <template>
-  <Streamdown :content="content" :is-animating="isAnimating" animated caret="block" />
+  <Streamdown
+    :content="content"
+    :is-animating="isAnimating"
+    :plugins="plugins"
+    animated
+    caret="block"
+  />
+</template>
+```
+
+### With Vercel AI SDK
+
+Works out of the box with `@ai-sdk/vue`:
+
+```vue
+<script setup>
+import { useChat } from '@ai-sdk/vue'
+import { Streamdown } from 'streamdown-vue3'
+import { code } from 'streamdown-vue3/code'
+import 'streamdown-vue3/styles.css'
+
+const { messages, input, handleSubmit, isLoading } = useChat()
+const plugins = { code: code() }
+</script>
+
+<template>
+  <div v-for="message in messages" :key="message.id">
+    <Streamdown
+      :content="message.content"
+      :is-animating="isLoading && message.id === messages[messages.length - 1]?.id"
+      :mode="isLoading ? 'streaming' : 'static'"
+      :plugins="plugins"
+      animated
+      caret="block"
+    />
+  </div>
+
+  <form @submit="handleSubmit">
+    <input v-model="input" placeholder="Say something..." />
+  </form>
 </template>
 ```
 
@@ -97,15 +142,59 @@ Blinking cursor that shows where content is being generated.
 <Streamdown :content="text" :is-animating="true" caret="circle" />
 ```
 
-### Code Blocks with Shiki
+### Plugins
 
-Syntax highlighting for 200+ languages via [Shiki](https://shiki.style). Grammars lazy-load on demand. Copy and download buttons included.
+Features like code blocks and mermaid diagrams are tree-shakeable plugins. You only pay for what you use.
 
 ```vue
-<Streamdown :content="text" :shiki-theme="['github-light', 'github-dark']" />
+<script setup>
+import { Streamdown } from 'streamdown-vue3'
+import { code } from 'streamdown-vue3/code'
+import { mermaid } from 'streamdown-vue3/mermaid'
+
+const plugins = { code: code(), mermaid: mermaid() }
+</script>
+
+<template>
+  <Streamdown :content="text" :plugins="plugins" />
+</template>
 ```
 
-For SSR and Nuxt usage, code blocks render as plain `<pre><code>` on the server and during initial hydration, then enhance to Shiki-highlighted HTML after client mount. This keeps the initial markup deterministic and avoids hydration mismatches.
+Without plugins, code fences render as plain `<pre><code>` (browser default). The `code` plugin adds Shiki highlighting, copy/download buttons, and language labels. The `mermaid` plugin renders mermaid diagrams as SVG.
+
+You can also write custom plugins — see the `StreamdownPlugin` type export:
+
+```ts
+import type { StreamdownPlugin } from 'streamdown-vue3'
+```
+
+### Code Blocks with Shiki
+
+Requires the `code` plugin. Syntax highlighting for 200+ languages via [Shiki](https://shiki.style). Grammars lazy-load on demand. Copy and download buttons included.
+
+```vue
+<Streamdown
+  :content="text"
+  :plugins="{ code: code() }"
+  :shiki-theme="['github-light', 'github-dark']"
+/>
+```
+
+Without Shiki installed, code blocks fall back to plain `<pre><code>` with language labels and copy/download buttons still working.
+
+### Mermaid Diagrams
+
+Requires the `mermaid` plugin and `mermaid` package:
+
+```bash
+pnpm add mermaid
+```
+
+```vue
+<Streamdown :content="text" :plugins="{ code: code(), mermaid: mermaid() }" />
+```
+
+During streaming, mermaid source is shown as raw code. Once streaming completes, the diagram is rendered as SVG. Falls back to source code with an error message if rendering fails.
 
 ### GFM Support
 
@@ -130,6 +219,18 @@ Override any markdown element with your own Vue component:
 ### Security
 
 Sanitized by default with `rehype-sanitize`. Dangerous protocols (`javascript:`, `vbscript:`) are stripped from URLs.
+
+### Accessibility
+
+The root element uses `role="log"` with `aria-live="polite"` during streaming, so screen readers announce new content as it arrives. Code block buttons have `aria-label` attributes.
+
+### Error Handling
+
+If markdown processing fails for a block, the component falls back to rendering plain text and emits an `error` event:
+
+```vue
+<Streamdown :content="text" @error="(err) => console.error('Parse error:', err)" />
+```
 
 ## Props
 
@@ -156,12 +257,30 @@ Sanitized by default with `rehype-sanitize`. Dangerous protocols (`javascript:`,
 
 ### Events
 
-| Event              | Description                                 |
-| ------------------ | ------------------------------------------- |
-| `@animation-start` | Fired when `isAnimating` changes to `true`  |
-| `@animation-end`   | Fired when `isAnimating` changes to `false` |
+| Event              | Description                                                                 |
+| ------------------ | --------------------------------------------------------------------------- |
+| `@animation-start` | Fired when `isAnimating` changes to `true`                                  |
+| `@animation-end`   | Fired when `isAnimating` changes to `false`                                 |
+| `@error`           | Fired when markdown processing fails for a block (falls back to plain text) |
 
 ## Styling
+
+### Theme Variables
+
+The component uses four CSS custom properties for colors. These have sensible defaults (light/dark via `prefers-color-scheme`), but you can override them to match your design system:
+
+```css
+[data-streamdown='root'] {
+  --sd-border: #e5e7eb;
+  --sd-muted: #f3f4f6;
+  --sd-muted-foreground: #6b7280;
+  --sd-foreground: #111827;
+}
+```
+
+These variables control code block borders, backgrounds, button colors, and skeleton placeholders. If you use a component library like Nuxt UI or shadcn-vue, you can map them to your existing tokens.
+
+### Element Selectors
 
 Every element has a `data-streamdown` attribute for CSS targeting:
 
@@ -183,15 +302,22 @@ Every element has a `data-streamdown` attribute for CSS targeting:
 }
 ```
 
-Available selectors: `root`, `block`, `heading-1` through `heading-6`, `paragraph`, `strong`, `emphasis`, `strikethrough`, `link`, `inline-code`, `pre`, `code-container`, `code-header`, `code-body`, `code-language`, `code-copy-button`, `code-download-button`, `blockquote`, `ordered-list`, `unordered-list`, `list-item`, `table-container`, `table`, `table-head`, `table-body`, `table-row`, `table-header`, `table-cell`, `image`, `hr`, `subscript`, `superscript`.
+Available selectors: `root`, `block`, `heading-1` through `heading-6`, `paragraph`, `strong`, `emphasis`, `strikethrough`, `link`, `inline-code`, `pre`, `code-container`, `code-header`, `code-body`, `code-language`, `code-copy-button`, `code-download-button`, `code-skeleton`, `blockquote`, `ordered-list`, `unordered-list`, `list-item`, `table-container`, `table`, `table-head`, `table-body`, `table-row`, `table-header`, `table-cell`, `image`, `hr`, `subscript`, `superscript`.
 
 ## Exports
 
-The package exports all internal components and utilities for advanced usage:
-
 ```ts
-// Components
-import { Streamdown, Block, CodeBlock, CodeBlockHeader } from 'streamdown-vue3'
+// Main entry
+import { Streamdown, Block } from 'streamdown-vue3'
+import { code } from 'streamdown-vue3' // also available from 'streamdown-vue3/code'
+import type { StreamdownPlugin, PluginComponentProps } from 'streamdown-vue3'
+
+// Code plugin (sub-path export)
+import { code, CodeBlock, CodeBlockHeader, CodeBlockBody } from 'streamdown-vue3/code'
+import { CopyIcon, CheckIcon, DownloadIcon } from 'streamdown-vue3/code'
+
+// Mermaid plugin (sub-path export)
+import { mermaid } from 'streamdown-vue3/mermaid'
 
 // Composables
 import { useStreamdownContext, usePlugins } from 'streamdown-vue3'
@@ -243,17 +369,20 @@ Ported from the React original — not yet at full feature parity. What's here:
 - [x] RTL/LTR auto-detection
 - [x] Custom component overrides
 - [x] HTML sanitization
+- [x] Accessibility (ARIA live regions, button labels)
+- [x] CSS custom property theming
+- [x] Error event handling
+- [x] Plugin architecture with tree-shakeable sub-path exports
+- [x] Code block plugin (Shiki highlighting, copy/download)
+- [x] Mermaid diagram plugin
 
 What's next:
 
 - [ ] Interactive tables (copy, download, fullscreen)
+- [ ] KaTeX math rendering plugin
 - [ ] Link safety modals
-- [ ] Mermaid diagram rendering
-- [ ] KaTeX math rendering
 - [ ] CJK plugin
 - [ ] i18n / translations
-- [ ] SSR / Nuxt compatibility
-- [ ] Tailwind prefix support
 
 ## Credits
 

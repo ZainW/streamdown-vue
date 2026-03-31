@@ -1,6 +1,6 @@
 import { defineComponent, h, ref } from 'vue'
-import { CopyIcon, CheckIcon } from '../icons'
-import { useStreamdownContext } from '../composables/useStreamdownContext'
+import { CopyIcon, CheckIcon } from '../icons/index'
+import { useStreamdownContext } from '../../../composables/useStreamdownContext'
 
 export const CodeBlockCopyButton = defineComponent({
   name: 'CodeBlockCopyButton',
@@ -56,10 +56,11 @@ export const CodeBlockCopyButton = defineComponent({
           type: 'button',
           'data-streamdown': 'code-copy-button',
           title: copied.value ? 'Copied!' : 'Copy code',
+          'aria-label': copied.value ? 'Copied!' : 'Copy code',
           disabled: ctx.isAnimating,
           onClick: handleCopy,
           class:
-            'inline-flex items-center justify-center rounded p-1 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50',
+            'inline-flex items-center justify-center rounded p-1 transition-colors disabled:opacity-50',
         },
         [h(copied.value ? CheckIcon : CopyIcon)],
       )

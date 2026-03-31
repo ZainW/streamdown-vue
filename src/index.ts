@@ -9,27 +9,13 @@ export { P, Strong, Em, Del, Sub, Sup } from './components/text'
 export { Ol, Ul, Li } from './components/lists'
 export { A } from './components/links'
 export { Blockquote } from './components/blockquote'
-export { Code, Pre } from './components/code'
+export { Code } from './components/code'
 export { Img } from './components/image'
 export { Hr } from './components/hr'
 export { Table, Thead, Tbody, Tr, Th, Td } from './components/table'
 
-// Code block components
-export { CodeBlock } from './code-block/CodeBlock'
-export { CodeBlockContainer } from './code-block/CodeBlockContainer'
-export { CodeBlockHeader } from './code-block/CodeBlockHeader'
-export { CodeBlockBody } from './code-block/CodeBlockBody'
-export { CodeBlockCopyButton } from './code-block/CodeBlockCopyButton'
-export { CodeBlockDownloadButton } from './code-block/CodeBlockDownloadButton'
-export { CodeBlockSkeleton } from './code-block/CodeBlockSkeleton'
-export {
-  useCodeBlockContext,
-  provideCodeBlockContext,
-  CodeBlockContextKey,
-} from './code-block/context'
-
-// Icons
-export { CopyIcon, CheckIcon, DownloadIcon } from './icons'
+// Code plugin (re-exported for convenience, also available from 'streamdown-vue3/code')
+export { code } from './plugins/code'
 
 // Composables
 export {
@@ -71,3 +57,4 @@ export type {
   BlockProps,
   ComponentMap,
 } from './types'
+export type { StreamdownPlugin, PluginComponentProps } from './types/plugin'

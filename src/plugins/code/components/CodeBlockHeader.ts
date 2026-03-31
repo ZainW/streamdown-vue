@@ -1,7 +1,7 @@
 import { defineComponent, h } from 'vue'
 import { CodeBlockCopyButton } from './CodeBlockCopyButton'
 import { CodeBlockDownloadButton } from './CodeBlockDownloadButton'
-import { useStreamdownContext } from '../composables/useStreamdownContext'
+import { useStreamdownContext } from '../../../composables/useStreamdownContext'
 
 export const CodeBlockHeader = defineComponent({
   name: 'CodeBlockHeader',
@@ -22,7 +22,7 @@ export const CodeBlockHeader = defineComponent({
           'span',
           {
             'data-streamdown': 'code-language',
-            class: 'text-xs text-muted-foreground select-none',
+            class: 'text-xs select-none',
           },
           props.language || 'text',
         ),
@@ -53,7 +53,7 @@ export const CodeBlockHeader = defineComponent({
         'div',
         {
           'data-streamdown': 'code-header',
-          class: 'flex items-center justify-between px-4 py-2 border-b border-border',
+          class: 'flex items-center justify-between px-4 py-2 border-b',
         },
         children,
       )

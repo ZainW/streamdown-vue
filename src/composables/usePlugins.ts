@@ -1,12 +1,13 @@
 import { inject, provide, type InjectionKey } from 'vue'
-import type { PluginConfig } from '../types'
+import type { StreamdownPlugin } from '../types/plugin'
 
-export const PluginContextKey: InjectionKey<PluginConfig> = Symbol('PluginContext')
+export const PluginContextKey: InjectionKey<Record<string, StreamdownPlugin>> =
+  Symbol('PluginContext')
 
-export function providePlugins(plugins: PluginConfig) {
+export function providePlugins(plugins: Record<string, StreamdownPlugin>) {
   provide(PluginContextKey, plugins)
 }
 
-export function usePlugins(): PluginConfig {
+export function usePlugins(): Record<string, StreamdownPlugin> {
   return inject(PluginContextKey, {})
 }

@@ -3,7 +3,7 @@ import { CodeBlockContainer } from './CodeBlockContainer'
 import { CodeBlockHeader } from './CodeBlockHeader'
 import { CodeBlockBody } from './CodeBlockBody'
 import { CodeBlockSkeleton } from './CodeBlockSkeleton'
-import { useStreamdownContext } from '../composables/useStreamdownContext'
+import { useStreamdownContext } from '../../../composables/useStreamdownContext'
 
 export const CodeBlock = defineComponent({
   name: 'CodeBlock',

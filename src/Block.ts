@@ -3,6 +3,7 @@ import { processMarkdown } from './Markdown'
 import type { Component } from 'vue'
 import type { Plugin as UnifiedPlugin } from 'unified'
 import type { createAnimatePlugin } from './lib/animate'
+import type { StreamdownPlugin } from './types/plugin'
 
 export const Block = defineComponent({
   name: 'StreamdownBlock',
@@ -47,9 +48,14 @@ export const Block = defineComponent({
     unwrapDisallowed: { type: Boolean, default: false },
     skipHtml: { type: Boolean, default: false },
     dir: { type: String as PropType<'ltr' | 'rtl' | undefined>, default: undefined },
+    plugins: {
+      type: Array as PropType<StreamdownPlugin[]>,
+      default: () => [],
+    },
     caret: { type: String as PropType<'block' | 'circle' | undefined>, default: undefined },
   },
-  setup(props) {
+  emits: ['error'],
+  setup(props, { emit }) {
     // Use shallowRef to avoid deep reactivity on VNode arrays
     const vnodes = shallowRef<(VNode | string)[]>([])
 
@@ -73,6 +79,7 @@ export const Block = defineComponent({
         vnodes.value = processMarkdown(props.content, {
           remarkPlugins: props.remarkPlugins,
           rehypePlugins,
+          plugins: props.plugins,
           components: props.components,
           urlTransform: props.urlTransform,
           allowedElements: props.allowedElements,
@@ -85,6 +92,7 @@ export const Block = defineComponent({
         // Graceful fallback: render content as plain text
         console.warn('[streamdown-vue] Markdown processing error:', err)
         vnodes.value = [props.content]
+        emit('error', err)
       }
     }
 
